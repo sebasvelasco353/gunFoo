@@ -5,3 +5,10 @@
 
 body {
   background-color: #bbb; }
+
+#gameContainer {
+  margin: auto auto;
+  width: 100vw;
+  height: 90vh;
+  background-color: #fff;
+  border-bottom: 5px solid #000; }
