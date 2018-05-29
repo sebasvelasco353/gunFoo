@@ -16,7 +16,13 @@
     "url": "https://github.com/sebasvelasco353/gunFoo/issues"
   },
   "homepage": "https://github.com/sebasvelasco353/gunFoo#readme",
-  "dependencies": {
+  "devDependencies": {
+    "grunt": "^1.0.2",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-uglify": "^3.3.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-sass": "^2.1.0",
     "node-sass": "^4.9.0"
-  }
+  },
+  "dependencies": {}
 }
