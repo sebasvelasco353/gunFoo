@@ -1,0 +1,22 @@
+{
+  "name": "gunfoo",
+  "version": "1.0.0",
+  "description": "Este es un juego de plataforma de un solo nivel que resulta de desarrollar un test como parte del proceso de seleccion de Foo Studio.",
+  "main": "index.js",
+  "scripts": {
+    "compile:sass": "node-sass ./app/sass/main.scss ./dist/css/index.css -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebasvelasco353/gunFoo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sebasvelasco353/gunFoo/issues"
+  },
+  "homepage": "https://github.com/sebasvelasco353/gunFoo#readme",
+  "dependencies": {
+    "node-sass": "^4.9.0"
+  }
+}
