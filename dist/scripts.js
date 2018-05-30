@@ -1,6 +1,25 @@
 
 
+/*
+* Clase Obstaculo
+* 
+* Se encarga de pintar el obstaculo
+*/
 
+function Obstacle(ctx, x, y, width, height) {
+    this.ctx = ctx; //Este es el contexto en el que se movera el personaje.
+    this.x = x; //posicion en el eje X
+    this.y = y; //posicion en el eje Y
+    this.width = width; //Ancho del personaje
+    this.height = height; //Alto del personaje
+    
+
+    // Funcion que pinta el personaje en una posicion dada por X y Y
+    this.draw = function () {
+        ctx.fillStyle = "gray";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+}
 /*
 * Clase Jugador
 * 
@@ -23,6 +42,7 @@ function Player(ctx, x, y) {
         ctx.fillStyle = "red";
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
+
 }
 /*
 * Clase Mundo
@@ -52,9 +72,68 @@ var friction = 0.8;
 var gravity = 0.3;
 // creo una instancia de mi jugador
 const player = new Player(context, 100, 100);
-// Array where i create my obstacles
+// Array where i store my obstacles
 var obstacles = [];
+// crear y agregar al array las instancias de los obstaculos, estos son creados con numeros random
+// la posicion esta enmarcada de forma random entre los valores 0 y el alto y ancho de la pantalla
+// el alto y ancho con random entre valores predefinidos
+for (let i = 0; i < 4; i++) {
+    let element = new Obstacle(context, Math.floor((Math.random() * windowWidth) + 1), Math.floor((Math.random() * windowHeight) + 1), Math.floor((Math.random() * 600) + 1), Math.floor((Math.random() * 1000) + 1));
+    obstacles.push(element);
+    console.log(element);
+}
+// Variables para verificar collide
+var centerA = {
+    x: null,
+    y: null
+};
+var centerB = {
+    x: null,
+    y: null
+};
+var minDist = {
+    x: null,
+    y: null
+};
+var dist = {
+    x: null,
+    y: null
+};
+// Metodo que ayuda a detectar si hay o no collide entre dos objetos
+function checkCollide(objectA, objectB) {
+    /*
+    * Este metodo realiza la verificacion en dos partes, primero con x y despues con y
+    * primero verifica si la distancia entre los dos puntos centrales de los objetos 
+    * es mayor que la suma de las distancias entre el centro y el vertice exterior
+    * de cada objeto, si es mayor significa que no estan chocando en ese eje y pasa al siguiente
+    */
 
+    // Encuentro distancia entre un corner y el punto central
+    centerA.x = objectA.x + (objectA.width / 2);
+    centerA.y = objectA.y + (objectA.height / 2);
+    centerB.x = objectB.x + (objectB.width / 2);
+    centerB.y = objectB.y + (objectB.height / 2);
+    // Encuentro distancia minima para no collide
+    minDist.x = (objectA.width / 2) + (objectB.width / 2);
+    minDist.y = (objectA.height / 2) + (objectB.height / 2);
+    // Encuentro la distancia entre el centro de a y el centro de B
+    dist.x = centerA.x - centerB.x;
+    dist.y = centerA.y - centerB.y;
+    // convierto a positivo en caso de obtener un numero negativo
+    if (dist.x < 0) {
+        dist.x = dist.x * (-1);
+    }
+    if (dist.y < 0) {
+        dist.y = dist.y * (-1);
+    }
+    // verifico el collide
+    if (dist.x <= minDist.x) {
+        console.log('touching on x');
+        if (dist.y <= minDist.y) {
+            console.log('touching on x and y');
+        }
+    }
+}
 
 // Creo un arreglo donde tendre las teclas que se presionaran para asi poder conectarlas con las acciones,
 // no lo hago con un solo metodo keypressed por cada una de las teclas que se presionaran pues el usuario debe poder usar varias teclas al mismo tiempo
@@ -80,7 +159,7 @@ function movePlayer() {
         player.velX = 6;
     }
     if (keys[37]) {
-        // Izquierda                
+        // Izquierda   
         player.velX = -6;
     }
     // Aplicar la friccin del suelo sobre la superficie del personaje
@@ -91,14 +170,14 @@ function movePlayer() {
     player.x += player.velX;
     player.y += player.velY;
     // para que no se salga de la pantalla en x
-    if (player.x >= windowWidth-player.width) {
-        player.x = windowWidth-player.width;
+    if (player.x >= windowWidth - player.width) {
+        player.x = windowWidth - player.width;
     } else if (player.x <= 0) {
         player.x = 0;
     }
     // para que no se salga de la pantalla en Y
-    if (player.y >= windowHeight-player.height) {
-        player.y = windowHeight-player.height;
+    if (player.y >= windowHeight - player.height) {
+        player.y = windowHeight - player.height;
     } else if (player.y <= 0) {
         player.y = 0;
     }
@@ -110,6 +189,11 @@ function update() {
     // Primero muevo el personaje, despues lo dibujo en la pantalla
     movePlayer();
     player.draw();
+    // Recorro el arreglo de obstaculos y los pinto para despues verificar si el player esta colliding con ellos
+    for (let i = 0; i < obstacles.length; i++) {
+        obstacles[i].draw();
+        checkCollide(player, obstacles[i]);
+    }
     requestAnimationFrame(update);
 }
 // Cuando la ventana cargue va a correr por primera vez el metodo update, este se llamara constantemente a si mismo

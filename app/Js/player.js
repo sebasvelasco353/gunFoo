@@ -20,4 +20,5 @@ function Player(ctx, x, y) {
         ctx.fillStyle = "red";
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
+
 }
