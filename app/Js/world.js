@@ -62,6 +62,7 @@ function checkCollide(objectA, objectB) {
     * de cada objeto, si es mayor significa que no estan chocando en ese eje y pasa al siguiente
     */
 
+    var direction = null;
     // Encuentro distancia entre un corner y el punto central
     centerA.x = objectA.x + (objectA.width / 2);
     centerA.y = objectA.y + (objectA.height / 2);
@@ -81,10 +82,18 @@ function checkCollide(objectA, objectB) {
         dist.y = dist.y * (-1);
     }
     // verifico el collide
-    if (dist.x <= minDist.x) {
-        console.log('touching on x');
-        if (dist.y <= minDist.y) {
-            console.log('touching on x and y');
+    if ((dist.x <= minDist.x) && (dist.y <= minDist.y)) {
+        if (objectA.x < objectB.x) {
+            return direction = 'right';
+        } else {
+            return direction = 'left';
+        }
+        if (objectA.y > objectB.y) {
+            console.log('bottom crash');
+            return direction = 'top';
+        } else {
+            console.log('top crash');
+            return direction = 'bot';
         }
     }
 }
@@ -109,12 +118,31 @@ function movePlayer() {
         player.velY = -6;
     }
     if (keys[39]) {
-        // Derecha
+        // der
         player.velX = 6;
     }
     if (keys[37]) {
-        // Izquierda   
+        // izq
         player.velX = -6;
+    }
+
+    for (var i = 0; i < obstacles.length; i++) {
+        obstacles[i].draw();
+        var dir = checkCollide(player, obstacles[i]);
+
+        if (dir === "right") {
+            player.velX = 0;
+            player.x = player.x - 10;
+            // player.x
+        } else if (dir === "left") {
+            player.velX = 0;
+            player.x = player.x + 10;
+        } else if (dir === "bot") {
+            
+        } else if (dir === "top") {
+            player.velY = 0;
+        }
+
     }
     // Aplicar la friccin del suelo sobre la superficie del personaje
     player.velX *= friction;
@@ -143,11 +171,6 @@ function update() {
     // Primero muevo el personaje, despues lo dibujo en la pantalla
     movePlayer();
     player.draw();
-    // Recorro el arreglo de obstaculos y los pinto para despues verificar si el player esta colliding con ellos
-    for (let i = 0; i < obstacles.length; i++) {
-        obstacles[i].draw();
-        checkCollide(player, obstacles[i]);
-    }
     requestAnimationFrame(update);
 }
 // Cuando la ventana cargue va a correr por primera vez el metodo update, este se llamara constantemente a si mismo
