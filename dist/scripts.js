@@ -5,7 +5,7 @@
 * Se encarga de pintar el enemigo en las posiciones x, y
 */
 
-function Player(ctx, x, y, color) {
+function Enemy(ctx, x, y, color) {
     this.ctx = ctx; //Este es el contexto en el que se movera el personaje.
     this.x = x; //posicion en el eje X
     this.y = y; //posicion en el eje Y
@@ -116,6 +116,7 @@ var dist = {
     x: null,
     y: null
 };
+var step = true;
 // Metodo que ayuda a detectar si hay o no collide entre dos objetos
 function checkCollide(objectA, objectB) {
     /*
@@ -150,13 +151,14 @@ function checkCollide(objectA, objectB) {
             direction[0] = 'top';
         } else {
             direction[0] = 'bot';
+            gravity = 0;
         }
-        if (objectA.x < objectB.x) {
+        if (objectA.x <= objectB.x) {
             direction[1] = 'right';
         } else {
             direction[1] = 'left';
         }
-    } else if (dist.x > minDist.x) {
+    } else {
         gravity = 0.3;
     }
     return direction;
@@ -199,16 +201,20 @@ function movePlayer() {
             player.velX = 1;
         }
         if (dir[0] === 'bot') {
-            player.velY = 0;
-            gravity = 0;
+            player.velY = -1;
+            step = true;
         } else if (dir[0] === 'top') {
             player.velY *= -1;
+            parado = false;
         }
         else {
             player.velY = player.velY;
         }
     }
 
+    if(step){
+        gravity = 0.3;
+    }
     // Aplicar la friccin del suelo sobre la superficie del personaje
     player.velX *= friction;
     // aplico la gravedad al personaje

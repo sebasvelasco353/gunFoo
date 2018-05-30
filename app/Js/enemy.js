@@ -4,7 +4,7 @@
 * Se encarga de pintar el enemigo en las posiciones x, y
 */
 
-function Player(ctx, x, y, color) {
+function Enemy(ctx, x, y, color) {
     this.ctx = ctx; //Este es el contexto en el que se movera el personaje.
     this.x = x; //posicion en el eje X
     this.y = y; //posicion en el eje Y
