@@ -1,16 +1,38 @@
+/*
+* Este objeto es la bala, tiene una posicion X y una posicion Y, una velocidad
+*/
+function Bullet(ctx, x, y, index) {
+    this.ctx = ctx; //Este es el contexto en el que se movera el personaje.
+    this.x = x; //posicion en el eje X
+    this.y = y; //posicion en el eje Y
+    this.width = 10; //Ancho del personaje
+    this.height = 10; //Alto del personaje
+    this.velocity = 2;
+    this.index = index;
 
+    // Funcion que pinta el personaje en una posicion dada por X y Y
+    this.draw = function () {
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.move = function() {
+        this.x += 3;
+    }
+
+}
 /*
 * Clase Enemigo
 * 
 * Se encarga de pintar el enemigo en las posiciones x, y
 */
 
-function Enemy(ctx, x, y, color) {
+function Enemy(ctx, x, y, color, index) {
     this.ctx = ctx; //Este es el contexto en el que se movera el personaje.
     this.x = x; //posicion en el eje X
     this.y = y; //posicion en el eje Y
     this.width = 20; //Ancho del personaje
     this.height = 50; //Alto del personaje
+    this.index = index;
 
     // Funcion que pinta el personaje en una posicion dada por X y Y
     this.draw = function () {
@@ -77,7 +99,7 @@ function Player(ctx, x, y) {
 
 // Window dimensions
 const windowWidth = window.innerWidth;
-const windowHeight = window.innerHeight-100;
+const windowHeight = window.innerHeight - 100;
 // Canvas element and 2d context
 var canvas = document.querySelector('canvas');
 var context = canvas.getContext("2d");
@@ -92,12 +114,32 @@ var gravity = 0.3;
 const player = new Player(context, 100, windowHeight - 20);
 // Array where i store my obstacles
 var obstacles = [];
+// Array de enemigos
+var enemies = [];
+// Array donde guardo las balas
+var bullets = [];
+// Metodo que se encarga de generar un color para cada enemigo 
+function generateColor() {
+    var uno = Math.floor(Math.random() * 9);
+    var dos = Math.floor(Math.random() * 9);
+    var tres = Math.floor(Math.random() * 9);
+    var cuatro = Math.floor(Math.random() * 9);
+    var cinco = Math.floor(Math.random() * 9);
+    var seis = Math.floor(Math.random() * 9);
+    var color = "#" + uno + dos + tres + cuatro + cinco + seis;
+    return color;
+}
 // crear y agregar al array las instancias de los obstaculos, estos son creados con numeros random
 // la posicion esta enmarcada de forma random entre los valores 0 y el alto y ancho de la pantalla
 // el alto y ancho con random entre valores predefinidos
 for (let i = 0; i < 4; i++) {
     let element = new Obstacle(context, Math.floor((Math.random() * windowWidth) + 1), Math.floor((Math.random() * windowHeight) + 1), Math.floor((Math.random() * 600) + 1), Math.floor((Math.random() * 1000) + 1));
     obstacles.push(element);
+}
+// lleno el arreglo con enemigos creados a nivel del suelo en posiciones X aleatorias
+for (let i = 0; i < 4; i++) {
+    let element = new Enemy(context, Math.floor((Math.random() * windowWidth) + 1), windowHeight - 30, generateColor(), i);
+    enemies.push(element);
 }
 // Variables para verificar collide
 var centerA = {
@@ -164,6 +206,41 @@ function checkCollide(objectA, objectB) {
     return direction;
 }
 
+function checkCollideBullet(objectA, objectB) {
+    /*
+    * Este metodo realiza la verificacion en dos partes, primero con x y despues con y
+    * primero verifica si la distancia entre los dos puntos centrales de los objetos 
+    * es mayor que la suma de las distancias entre el centro y el vertice exterior
+    * de cada objeto, si es mayor significa que no estan chocando en ese eje y pasa al siguiente
+    */
+
+    var direction = []
+    // Encuentro distancia entre un corner y el punto central
+    centerA.x = objectA.x + (objectA.width / 2);
+    centerA.y = objectA.y + (objectA.height / 2);
+    centerB.x = objectB.x + (objectB.width / 2);
+    centerB.y = objectB.y + (objectB.height / 2);
+    // Encuentro distancia minima para no collide
+    minDist.x = (objectA.width / 2) + (objectB.width / 2);
+    minDist.y = (objectA.height / 2) + (objectB.height / 2);
+    // Encuentro la distancia entre el centro de a y el centro de B
+    dist.x = centerA.x - centerB.x;
+    dist.y = centerA.y - centerB.y;
+    // convierto a positivo en caso de obtener un numero negativo
+    if (dist.x < 0) {
+        dist.x = dist.x * (-1);
+    }
+    if (dist.y < 0) {
+        dist.y = dist.y * (-1);
+    }
+    // verifico el collide
+    if ((dist.x <= minDist.x) && (dist.y <= minDist.y)) {
+        console.log('mataste el bicho ', objectB);
+        bullets.splice(objectA.index, 1);
+        enemies.splice(objectB.index, 1);
+    }
+}
+
 // Creo un arreglo donde tendre las teclas que se presionaran para asi poder conectarlas con las acciones,
 // no lo hago con un solo metodo keypressed por cada una de las teclas que se presionaran pues el usuario debe poder usar varias teclas al mismo tiempo
 // como por ejemplo caminar y disparar o saltar y moverse hacia el frente.
@@ -191,6 +268,10 @@ function movePlayer() {
         // izq
         player.velX = -6;
     }
+    if (keys[32]) {
+        // new Bullet
+        bullets.push(new Bullet(context, player.x + player.width, player.y + player.height / 4, i));
+    }
 
     for (var i = 0; i < obstacles.length; i++) {
         obstacles[i].draw();
@@ -212,10 +293,10 @@ function movePlayer() {
         }
     }
 
-    if(step){
+    if (step) {
         gravity = 0.3;
     }
-    // Aplicar la friccin del suelo sobre la superficie del personaje
+    // Aplicar la friccion del suelo sobre la superficie del personaje
     player.velX *= friction;
     // aplico la gravedad al personaje
     player.velY += gravity;
@@ -242,6 +323,18 @@ function update() {
     // Primero muevo el personaje, despues lo dibujo en la pantalla
     movePlayer();
     player.draw();
+    for (let z = 0; z < enemies.length; z++) {
+        enemies[z].draw();
+
+    }
+    for (let i = 0; i < bullets.length; i++) {
+        // console.log(bullets[i]);
+        bullets[i].draw();
+        bullets[i].move();
+        for (let a = 0; a < enemies.length; a++) {
+            checkCollideBullet(bullets[i], enemies[a]);
+        }
+    }
     requestAnimationFrame(update);
 }
 // Cuando la ventana cargue va a correr por primera vez el metodo update, este se llamara constantemente a si mismo
