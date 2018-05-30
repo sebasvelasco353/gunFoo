@@ -13,7 +13,7 @@
 
 // Window dimensions
 const windowWidth = window.innerWidth;
-const windowHeight = window.innerHeight;
+const windowHeight = window.innerHeight-100;
 // Canvas element and 2d context
 var canvas = document.querySelector('canvas');
 var context = canvas.getContext("2d");
@@ -25,7 +25,7 @@ var friction = 0.8;
 // La gravedad hace que poco a poco disminuya la velocidad hacia arriba del personaje y vuelva a bajar
 var gravity = 0.3;
 // creo una instancia de mi jugador
-const player = new Player(context, 100, 100);
+const player = new Player(context, 100, windowHeight - 20);
 // Array where i store my obstacles
 var obstacles = [];
 // crear y agregar al array las instancias de los obstaculos, estos son creados con numeros random
@@ -34,7 +34,6 @@ var obstacles = [];
 for (let i = 0; i < 4; i++) {
     let element = new Obstacle(context, Math.floor((Math.random() * windowWidth) + 1), Math.floor((Math.random() * windowHeight) + 1), Math.floor((Math.random() * 600) + 1), Math.floor((Math.random() * 1000) + 1));
     obstacles.push(element);
-    console.log(element);
 }
 // Variables para verificar collide
 var centerA = {
@@ -62,7 +61,7 @@ function checkCollide(objectA, objectB) {
     * de cada objeto, si es mayor significa que no estan chocando en ese eje y pasa al siguiente
     */
 
-    var direction = null;
+    var direction = []
     // Encuentro distancia entre un corner y el punto central
     centerA.x = objectA.x + (objectA.width / 2);
     centerA.y = objectA.y + (objectA.height / 2);
@@ -83,19 +82,20 @@ function checkCollide(objectA, objectB) {
     }
     // verifico el collide
     if ((dist.x <= minDist.x) && (dist.y <= minDist.y)) {
+        if (objectA.y >= objectB.y) {
+            direction[0] = 'top';
+        } else {
+            direction[0] = 'bot';
+        }
         if (objectA.x < objectB.x) {
-            return direction = 'right';
+            direction[1] = 'right';
         } else {
-            return direction = 'left';
+            direction[1] = 'left';
         }
-        if (objectA.y > objectB.y) {
-            console.log('bottom crash');
-            return direction = 'top';
-        } else {
-            console.log('top crash');
-            return direction = 'bot';
-        }
+    } else if (dist.x > minDist.x) {
+        gravity = 0.3;
     }
+    return direction;
 }
 
 // Creo un arreglo donde tendre las teclas que se presionaran para asi poder conectarlas con las acciones,
@@ -129,27 +129,29 @@ function movePlayer() {
     for (var i = 0; i < obstacles.length; i++) {
         obstacles[i].draw();
         var dir = checkCollide(player, obstacles[i]);
-
-        if (dir === "right") {
-            player.velX = 0;
-            player.x = player.x - 10;
-            // player.x
-        } else if (dir === "left") {
-            player.velX = 0;
-            player.x = player.x + 10;
-        } else if (dir === "bot") {
-            
-        } else if (dir === "top") {
-            player.velY = 0;
+        if (dir[1] === "right") {
+            player.velX = -1;
+        } else if (dir[1] === "left") {
+            player.velX = 1;
         }
-
+        if (dir[0] === 'bot') {
+            player.velY = 0;
+            gravity = 0;
+        } else if (dir[0] === 'top') {
+            player.velY *= -1;
+        }
+        else {
+            player.velY = player.velY;
+        }
     }
+
     // Aplicar la friccin del suelo sobre la superficie del personaje
     player.velX *= friction;
     // aplico la gravedad al personaje
     player.velY += gravity;
     // Mover el personaje
     player.x += player.velX;
+    console.log('ply y ', player.y, ' pay vel y ', player.velY, ' ply grav ', gravity);
     player.y += player.velY;
     // para que no se salga de la pantalla en x
     if (player.x >= windowWidth - player.width) {
