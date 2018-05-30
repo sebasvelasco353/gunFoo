@@ -14,7 +14,6 @@
 // Window dimensions
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
-
 // Canvas element and 2d context
 var canvas = document.querySelector('canvas');
 var context = canvas.getContext("2d");
@@ -27,6 +26,10 @@ var friction = 0.8;
 var gravity = 0.3;
 // creo una instancia de mi jugador
 const player = new Player(context, 100, 100);
+// Array where i create my obstacles
+var obstacles = [];
+
+
 // Creo un arreglo donde tendre las teclas que se presionaran para asi poder conectarlas con las acciones,
 // no lo hago con un solo metodo keypressed por cada una de las teclas que se presionaran pues el usuario debe poder usar varias teclas al mismo tiempo
 // como por ejemplo caminar y disparar o saltar y moverse hacia el frente.
@@ -76,6 +79,8 @@ function movePlayer() {
 }
 // funcion update que corre los metodos de pintar y controlar las cosas cada frame
 function update() {
+    // borro lo que estaba antes
+    context.clearRect(0, 0, windowWidth, windowHeight);
     // Primero muevo el personaje, despues lo dibujo en la pantalla
     movePlayer();
     player.draw();
