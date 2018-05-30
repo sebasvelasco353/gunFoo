@@ -8,14 +8,6 @@ module.exports = function (grunt) {
                 dest: 'dist/scripts.js',
             },
         },
-        uglify: {
-            build: {
-                files: [{
-                    src: 'dist/scripts.js',
-                    dest: 'dist/scripts.js'
-                }]
-            }
-        },
         sass: {
             build: {
                 files: [{
@@ -28,7 +20,7 @@ module.exports = function (grunt) {
             js: {
                 // if a js file changes concatenate then uglify
                 files: ['app/js/*.js'],
-                tasks: ['concat', 'uglify']
+                tasks: ['concat']
             },
             sass: {
                 // if a sass file changes run the sass compiler
@@ -41,8 +33,6 @@ module.exports = function (grunt) {
     /* Load plugins */
     // Concatenate code
     grunt.loadNpmTasks('grunt-contrib-concat');
-    // minim the js
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     // compile sass files into css
     grunt.loadNpmTasks('grunt-sass');
     // watch changes on files
@@ -50,6 +40,6 @@ module.exports = function (grunt) {
 
     /* Register a default task that conatenates, minyfies, compiles sass 
     into css and finally watches for changes so it can do the process again */
-    grunt.registerTask('default', ['concat', 'uglify', 'sass', 'watch']);
+    grunt.registerTask('default', ['concat', 'sass', 'watch']);
 
 }
