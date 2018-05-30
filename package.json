@@ -4,7 +4,8 @@
   "description": "Este es un juego de plataforma de un solo nivel que resulta de desarrollar un test como parte del proceso de seleccion de Foo Studio.",
   "main": "index.js",
   "scripts": {
-    "compile:sass": "node-sass ./app/sass/main.scss ./dist/css/index.css -w"
+    "compile:sass": "node-sass ./app/sass/main.scss ./dist/css/index.css -w",
+    "serve": "live-server dist/"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,7 @@
     "grunt-sass": "^2.1.0",
     "node-sass": "^4.9.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "live-server": "^1.2.0"
+  }
 }

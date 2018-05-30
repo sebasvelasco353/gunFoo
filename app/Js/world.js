@@ -151,7 +151,6 @@ function movePlayer() {
     player.velY += gravity;
     // Mover el personaje
     player.x += player.velX;
-    console.log('ply y ', player.y, ' pay vel y ', player.velY, ' ply grav ', gravity);
     player.y += player.velY;
     // para que no se salga de la pantalla en x
     if (player.x >= windowWidth - player.width) {
