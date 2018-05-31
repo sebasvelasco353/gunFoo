@@ -52,7 +52,7 @@ for (let i = 0; i < 4; i++) {
 }
 // lleno el arreglo con enemigos creados a nivel del suelo en posiciones X aleatorias
 for (let i = 0; i < 4; i++) {
-    let element = new Enemy(context, Math.floor((Math.random() * windowWidth) + 1), windowHeight - 30, generateColor(), i);
+    let element = new Enemy(context, Math.floor((Math.random() * windowWidth) + 1), windowHeight - 30, generateColor());
     enemies.push(element);
 }
 // Variables para verificar collide
@@ -149,9 +149,11 @@ function checkCollideBullet(objectA, objectB) {
     }
     // verifico el collide
     if ((dist.x <= minDist.x) && (dist.y <= minDist.y)) {
-        console.log('mataste el bicho ', objectB);
-        bullets.splice(objectA.index, 1);
-        enemies.splice(objectB.index, 1);
+        // console.log('mataste el bicho ', objectB);
+        var indexEnemy = enemies.indexOf(objectB);
+        var indexBullet = bullets.indexOf(objectA);
+        bullets.splice(indexBullet, 1);
+        enemies.splice(indexEnemy, 1);
     }
 }
 
@@ -184,7 +186,7 @@ function movePlayer() {
     }
     if (keys[32]) {
         // new Bullet
-        bullets.push(new Bullet(context, player.x + player.width, player.y + player.height / 4, i));
+        bullets.push(new Bullet(context, player.x + player.width, player.y + player.height / 4));
     }
 
     for (var i = 0; i < obstacles.length; i++) {
@@ -239,7 +241,6 @@ function update() {
     player.draw();
     for (let z = 0; z < enemies.length; z++) {
         enemies[z].draw();
-
     }
     for (let i = 0; i < bullets.length; i++) {
         // console.log(bullets[i]);
